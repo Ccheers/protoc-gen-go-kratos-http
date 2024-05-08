@@ -27,6 +27,10 @@ func New{{.ServiceType}}HTTPServerMiddleware(
             {{- end}}
         ).Path(Operation{{$svrType}}{{.OriginalName}}).Build(),
     {{- end}}
+    ).Path(
+    {{- range .MethodSets }}
+        Operation{{$svrType}}{{.OriginalName}},
+    {{- end}}
     ).Build()
 }
 
