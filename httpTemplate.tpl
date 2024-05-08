@@ -20,13 +20,13 @@ func New{{.ServiceType}}HTTPServerMiddleware(
     {{- end}}
 ) middleware.Middleware {
     return selector.Server(
-        {{- range .MethodSets }}
-            select.Server(
-                {{- range .MiddlewareNames }}
-                    {{.}},
-                {{- end}}
-            ).Path(Operation{{$svrType}}{{.OriginalName}}).Build(),
-        {{- end}}
+    {{- range .MethodSets }}
+        selector.Server(
+            {{- range .MiddlewareNames }}
+                {{.}},
+            {{- end}}
+        ).Path(Operation{{$svrType}}{{.OriginalName}}).Build(),
+    {{- end}}
     ).Build()
 }
 
