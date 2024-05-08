@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/Ccheers/protoc-gen-go-kratos-http/khttp"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"google.golang.org/genproto/googleapis/api/annotations"
@@ -228,6 +229,14 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 	if comment != "" {
 		comment = "// " + m.GoName + strings.TrimPrefix(strings.TrimSuffix(comment, "\n"), "//")
 	}
+
+	// 有定义优先取定义
+	var middlewareNames = parseMiddleware(m.Comments.Leading.String())
+	rule, ok := proto.GetExtension(m.Desc.Options(), khttp.E_Middleware).(*khttp.Middleware)
+	if ok {
+		middlewareNames = rule.Names
+	}
+
 	return &methodDesc{
 		Name:            m.GoName,
 		OriginalName:    string(m.Desc.Name()),
@@ -241,7 +250,7 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 		HasBody:         false,
 		Body:            "",
 		ResponseBody:    "",
-		MiddlewareNames: parseMiddleware(m.Comments.Leading.String()),
+		MiddlewareNames: middlewareNames,
 	}
 }
 
