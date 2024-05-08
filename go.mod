@@ -1,4 +1,4 @@
-module protoc-gen-go-kratos-http
+module github.com/Ccheers/protoc-gen-go-kratos-http
 
 go 1.21
 
