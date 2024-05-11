@@ -29,17 +29,17 @@ const OperationExampleHelloWorld = "/github.ccheers.pggh.example.Example/HelloWo
 type ExampleHTTPServer interface {
 	HelloWorld(context.Context, *HelloWorldRequest) (*HelloWorldReply, error)
 }
+type Examplemiddleware1Middleware middleware.Middleware
+type Examplemiddleware2Middleware middleware.Middleware
 
-type ExampleHTTPServerMiddlewareConfig struct {
-	Middleware1 middleware.Middleware
-	Middleware2 middleware.Middleware
-}
-
-func NewExampleHTTPServerMiddleware(mc ExampleHTTPServerMiddlewareConfig) middleware.Middleware {
+func NewExampleHTTPServerMiddleware(
+	middleware1 Examplemiddleware1Middleware,
+	middleware2 Examplemiddleware2Middleware,
+) middleware.Middleware {
 	return selector.Server(
 		selector.Server(
-			mc.Middleware1,
-			mc.Middleware2,
+			middleware.Middleware(middleware1),
+			middleware.Middleware(middleware2),
 		).Path(OperationExampleHelloWorld).Build(),
 	).Path(
 		OperationExampleHelloWorld,
