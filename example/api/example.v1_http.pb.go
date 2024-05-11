@@ -8,7 +8,6 @@ package exampleapi
 
 import (
 	context "context"
-
 	middleware "github.com/go-kratos/kratos/v2/middleware"
 	selector "github.com/go-kratos/kratos/v2/middleware/selector"
 	http "github.com/go-kratos/kratos/v2/transport/http"
@@ -31,14 +30,16 @@ type ExampleHTTPServer interface {
 	HelloWorld(context.Context, *HelloWorldRequest) (*HelloWorldReply, error)
 }
 
-func NewExampleHTTPServerMiddleware(
-	middleware1 middleware.Middleware,
-	middleware2 middleware.Middleware,
-) middleware.Middleware {
+type ExampleHTTPServerMiddlewareConfig struct {
+	Middleware1 middleware.Middleware
+	Middleware2 middleware.Middleware
+}
+
+func NewExampleHTTPServerMiddleware(mc ExampleHTTPServerMiddlewareConfig) middleware.Middleware {
 	return selector.Server(
 		selector.Server(
-			middleware1,
-			middleware2,
+			mc.Middleware1,
+			mc.Middleware2,
 		).Path(OperationExampleHelloWorld).Build(),
 	).Path(
 		OperationExampleHelloWorld,

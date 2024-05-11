@@ -14,16 +14,18 @@ type {{.ServiceType}}HTTPServer interface {
 {{- end}}
 }
 
-func New{{.ServiceType}}HTTPServerMiddleware(
+type {{.ServiceType}}HTTPServerMiddlewareConfig struct {
     {{- range .MiddlewareNames }}
-        {{.}} middleware.Middleware,
+        {{.}} middleware.Middleware
     {{- end}}
-) middleware.Middleware {
+}
+
+func New{{.ServiceType}}HTTPServerMiddleware(mc {{.ServiceType}}HTTPServerMiddlewareConfig) middleware.Middleware {
     return selector.Server(
     {{- range .MethodSets }}
         selector.Server(
             {{- range .MiddlewareNames }}
-                {{.}},
+                mc.{{.}},
             {{- end}}
         ).Path(Operation{{$svrType}}{{.OriginalName}}).Build(),
     {{- end}}

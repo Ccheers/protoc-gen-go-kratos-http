@@ -67,3 +67,11 @@ func (s *serviceDesc) execute() string {
 	}
 	return strings.Trim(buf.String(), "\r\n")
 }
+
+func arrayMap[T any, S any](items []T, fn func(data T) S) []S {
+	dst := make([]S, 0, len(items))
+	for _, item := range items {
+		dst = append(dst, fn(item))
+	}
+	return dst
+}

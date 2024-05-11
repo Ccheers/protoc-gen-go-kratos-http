@@ -236,6 +236,14 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 	if ok {
 		middlewareNames = rule.Names
 	}
+	middlewareNames = arrayMap(middlewareNames, func(data string) string {
+		if data != "" {
+			dataRune := []rune(data)
+			dataRune[0] = []rune(strings.ToUpper(string(dataRune[0])))[0]
+			data = string(dataRune)
+		}
+		return data
+	})
 
 	return &methodDesc{
 		Name:            m.GoName,
