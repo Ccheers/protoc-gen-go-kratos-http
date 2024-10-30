@@ -22,12 +22,13 @@ type serviceDesc struct {
 
 type methodDesc struct {
 	// method
-	Name         string
-	OriginalName string // The parsed original name
-	Num          int
-	Request      string
-	Reply        string
-	Comment      string
+	Name           string
+	OriginalName   string // The parsed original name
+	Num            int
+	Request        string
+	Reply          string
+	LeadingComment string
+	Comment        string
 	// http_rule
 	Path            string
 	Method          string

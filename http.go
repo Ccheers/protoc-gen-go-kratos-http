@@ -23,6 +23,7 @@ const (
 	bindingPackage            = protogen.GoImportPath("github.com/go-kratos/kratos/v2/transport/http/binding")
 	middlewareSelectorPackage = protogen.GoImportPath("github.com/go-kratos/kratos/v2/middleware/selector")
 	middlewarePackage         = protogen.GoImportPath("github.com/go-kratos/kratos/v2/middleware")
+	routePackage              = protogen.GoImportPath("github.com/Ccheers/protoc-gen-go-kratos-http/route")
 )
 
 var methodSets = make(map[string]int)
@@ -62,6 +63,7 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	g.P("const _ = ", transportHTTPPackage.Ident("SupportPackageIsVersion1"))
 	g.P("type _ = ", middlewarePackage.Ident("Middleware"))
 	g.P("type _ = ", middlewareSelectorPackage.Ident("Builder"))
+	g.P("type _ = ", routePackage.Ident("Route"))
 	g.P()
 
 	for _, service := range file.Services {
@@ -225,9 +227,14 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 			}
 		}
 	}
-	comment := m.Comments.Leading.String() + m.Comments.Trailing.String()
-	if comment != "" {
-		comment = "// " + m.GoName + strings.TrimPrefix(strings.TrimSuffix(comment, "\n"), "//")
+	formatStr := func(str string) string {
+		str = strings.TrimPrefix(str, "//")
+		return strings.TrimSpace(str)
+	}
+	leadingComment := formatStr(m.Comments.Leading.String())
+	methodComment := leadingComment + formatStr(m.Comments.Trailing.String())
+	if methodComment != "" {
+		methodComment = "// " + m.GoName + strings.TrimPrefix(strings.TrimSuffix(methodComment, "\n"), "//")
 	}
 
 	// 有定义优先取定义
@@ -243,7 +250,8 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 		Num:             methodSets[m.GoName],
 		Request:         g.QualifiedGoIdent(m.Input.GoIdent),
 		Reply:           g.QualifiedGoIdent(m.Output.GoIdent),
-		Comment:         comment,
+		LeadingComment:  leadingComment,
+		Comment:         methodComment,
 		Path:            path,
 		Method:          method,
 		HasVars:         len(vars) > 0,

@@ -45,6 +45,18 @@ func Register{{.ServiceType}}HTTPServer(s *http.Server, srv {{.ServiceType}}HTTP
 	{{- end}}
 }
 
+func Generate{{.ServiceType}}HTTPServerRouteInfo() []route.Route {
+    routes := make([]route.Route, 0, {{ .Methods | len }})
+	{{- range .Methods}}
+	routes = append(routes, route.Route{
+        Method: "{{.Method}}",
+        Path: "{{.Path}}",
+        Comment: "{{.LeadingComment}}",
+	})
+	{{- end}}
+	return routes
+}
+
 {{range .Methods}}
 func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {

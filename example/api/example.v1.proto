@@ -8,6 +8,7 @@ import "khttp/middleware.proto";
 option go_package = "github.com/Ccheers/protoc-gen-go-kratos-http/example/api;exampleapi";
 
 service Example {
+  // some comment
   rpc HelloWorld(HelloWorldRequest) returns (HelloWorldReply) {
     option (google.api.http) = {
       post: "/v1/example/hello"
