@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package github.ccheers.pggh.khttp;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/Ccheers/protoc-gen-go-kratos-http/khttp;khttp";
+
+message AuditRule {
+  string module = 1;
+  string action = 2;
+  map<string, string> extract = 3;
+}
+
+extend google.protobuf.MethodOptions {
+  AuditRule audit = 873913;
+}

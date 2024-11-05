@@ -8,6 +8,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/Ccheers/protoc-gen-go-kratos-http/audit"
+
 	"github.com/Ccheers/protoc-gen-go-kratos-http/khttp"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
@@ -24,6 +26,7 @@ const (
 	middlewareSelectorPackage = protogen.GoImportPath("github.com/go-kratos/kratos/v2/middleware/selector")
 	middlewarePackage         = protogen.GoImportPath("github.com/go-kratos/kratos/v2/middleware")
 	routePackage              = protogen.GoImportPath("github.com/Ccheers/protoc-gen-go-kratos-http/route")
+	auditPackage              = protogen.GoImportPath("github.com/Ccheers/protoc-gen-go-kratos-http/audit")
 )
 
 var methodSets = make(map[string]int)
@@ -64,6 +67,7 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	g.P("type _ = ", middlewarePackage.Ident("Middleware"))
 	g.P("type _ = ", middlewareSelectorPackage.Ident("Builder"))
 	g.P("type _ = ", routePackage.Ident("Route"))
+	g.P("type _ = ", auditPackage.Ident("Audit"))
 	g.P()
 
 	for _, service := range file.Services {
@@ -244,6 +248,18 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 		middlewareNames = rule.Names
 	}
 
+	auditRule, ok := proto.GetExtension(m.Desc.Options(), khttp.E_Audit).(*khttp.AuditRule)
+	hasAudit := ok && auditRule != nil
+
+	var Audit *audit.Audit
+	if hasAudit {
+		Audit = &audit.Audit{
+			Module:  auditRule.GetModule(),
+			Action:  auditRule.GetAction(),
+			Extract: auditRule.GetExtract(),
+		}
+	}
+
 	return &methodDesc{
 		Name:            m.GoName,
 		OriginalName:    string(m.Desc.Name()),
@@ -259,6 +275,9 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 		Body:            "",
 		ResponseBody:    "",
 		MiddlewareNames: middlewareNames,
+
+		HasAudit: hasAudit,
+		Audit:    Audit,
 	}
 }
 

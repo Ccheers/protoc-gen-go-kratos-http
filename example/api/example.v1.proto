@@ -4,6 +4,7 @@ package github.ccheers.pggh.example;
 
 import "google/api/annotations.proto";
 import "khttp/middleware.proto";
+import "khttp/audit.proto";
 
 option go_package = "github.com/Ccheers/protoc-gen-go-kratos-http/example/api;exampleapi";
 
@@ -16,6 +17,18 @@ service Example {
     };
     option (khttp.middleware) = {
       names: ["middleware1", "middleware2"]
+    };
+    option (khttp.audit) = {
+      module: "example"
+      action: "hello"
+      extract: {
+        key: "name"
+        value: "name",
+      },
+      extract: {
+        key: "name2"
+        value: "name2"
+      }
     };
   };
 }

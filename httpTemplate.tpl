@@ -75,6 +75,17 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) fu
 		}
 		{{- end}}
 		http.SetOperation(ctx,Operation{{$svrType}}{{.OriginalName}})
+
+		{{- if .HasAudit}}
+        extract := audit.ExtractFromRequest(ctx.Request(), map[string]string{
+            {{- range $key, $value := .Audit.Extract}}
+            "{{$key}}": "{{$value}}",
+            {{- end}}
+        })
+        Audit := audit.NewAudit("{{.Audit.Module}}", "{{.Audit.Action}}", extract)
+        ctx = audit.NewContext(ctx, Audit)
+        {{- end}}
+
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.{{.Name}}(ctx, req.(*{{.Request}}))
 		})

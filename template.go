@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/Ccheers/protoc-gen-go-kratos-http/audit"
 )
 
 //go:embed httpTemplate.tpl
@@ -37,6 +39,10 @@ type methodDesc struct {
 	Body            string
 	ResponseBody    string
 	MiddlewareNames []string
+
+	// audit
+	HasAudit bool
+	Audit    *audit.Audit
 }
 
 var middleWareMatch = regexp.MustCompile("@[A-Za-z0-9_]+")
