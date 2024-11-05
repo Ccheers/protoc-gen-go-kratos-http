@@ -60,6 +60,7 @@ func Generate{{.ServiceType}}HTTPServerRouteInfo() []route.Route {
 {{range .Methods}}
 func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
+		stdCtx := kcontext.SetKHTTPContextWithContext(ctx, ctx)
 		var in {{.Request}}
 		{{- if .HasBody}}
 		if err := ctx.Bind(&in{{.Body}}); err != nil {
@@ -82,14 +83,15 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) fu
             "{{$key}}": "{{$value}}",
             {{- end}}
         })
-        Audit := audit.NewAudit("{{.Audit.Module}}", "{{.Audit.Action}}", extract)
-        ctx = audit.NewContext(ctx, Audit)
+        auditInfo := audit.NewAudit("{{.Audit.Module}}", "{{.Audit.Action}}", extract)
+		stdCtx = kcontext.SetKHTTPAuditContextWithContext(stdCtx, auditInfo)
+
         {{- end}}
 
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.{{.Name}}(ctx, req.(*{{.Request}}))
 		})
-		out, err := h(ctx, &in)
+		out, err := h(stdCtx, &in)
 		if err != nil {
 			return err
 		}

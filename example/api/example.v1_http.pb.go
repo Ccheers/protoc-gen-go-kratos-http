@@ -8,8 +8,8 @@ package exampleapi
 
 import (
 	context "context"
-
 	audit "github.com/Ccheers/protoc-gen-go-kratos-http/audit"
+	kcontext "github.com/Ccheers/protoc-gen-go-kratos-http/kcontext"
 	route "github.com/Ccheers/protoc-gen-go-kratos-http/route"
 	middleware "github.com/go-kratos/kratos/v2/middleware"
 	selector "github.com/go-kratos/kratos/v2/middleware/selector"
@@ -28,6 +28,8 @@ type _ = middleware.Middleware
 type _ = selector.Builder
 type _ = route.Route
 type _ = audit.Audit
+
+var _ = kcontext.SetKHTTPContextWithContext
 
 const OperationExampleHelloWorld = "/github.ccheers.pggh.example.Example/HelloWorld"
 
@@ -69,6 +71,7 @@ func GenerateExampleHTTPServerRouteInfo() []route.Route {
 
 func _Example_HelloWorld0_HTTP_Handler(srv ExampleHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
+		stdCtx := kcontext.SetKHTTPContextWithContext(ctx, ctx)
 		var in HelloWorldRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
@@ -81,13 +84,13 @@ func _Example_HelloWorld0_HTTP_Handler(srv ExampleHTTPServer) func(ctx http.Cont
 			"name":  "name",
 			"name2": "name2",
 		})
-		Audit := audit.NewAudit("example", "hello", extract)
-		ctx = audit.NewContext(ctx, Audit)
+		auditInfo := audit.NewAudit("example", "hello", extract)
+		stdCtx = kcontext.SetKHTTPAuditContextWithContext(stdCtx, auditInfo)
 
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.HelloWorld(ctx, req.(*HelloWorldRequest))
 		})
-		out, err := h(ctx, &in)
+		out, err := h(stdCtx, &in)
 		if err != nil {
 			return err
 		}
