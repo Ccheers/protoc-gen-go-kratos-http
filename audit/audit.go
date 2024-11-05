@@ -1,11 +1,9 @@
 package audit
 
 import (
-	"context"
 	"io"
 	"net/http"
 
-	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/tidwall/gjson"
 )
 
@@ -41,12 +39,4 @@ func NewAudit(module, action string, extract map[string]string) *Audit {
 		Action:  action,
 		Extract: extract,
 	}
-}
-
-func NewContext(ctx khttp.Context, audit *Audit) khttp.Context {
-	// 将审计信息注入到底层的 context.Context
-	newCtx := context.WithValue(ctx, "Audit", audit)
-	// 更新 Kratos HTTP Context
-	ctx.Request().WithContext(newCtx)
-	return ctx
 }

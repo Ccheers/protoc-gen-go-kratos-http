@@ -27,6 +27,7 @@ const (
 	middlewarePackage         = protogen.GoImportPath("github.com/go-kratos/kratos/v2/middleware")
 	routePackage              = protogen.GoImportPath("github.com/Ccheers/protoc-gen-go-kratos-http/route")
 	auditPackage              = protogen.GoImportPath("github.com/Ccheers/protoc-gen-go-kratos-http/audit")
+	kContextPackage           = protogen.GoImportPath("github.com/Ccheers/protoc-gen-go-kratos-http/kcontext")
 )
 
 var methodSets = make(map[string]int)
@@ -68,6 +69,7 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	g.P("type _ = ", middlewareSelectorPackage.Ident("Builder"))
 	g.P("type _ = ", routePackage.Ident("Route"))
 	g.P("type _ = ", auditPackage.Ident("Audit"))
+	g.P("var _ = ", kContextPackage.Ident("SetKHTTPContextWithContext"))
 	g.P()
 
 	for _, service := range file.Services {
