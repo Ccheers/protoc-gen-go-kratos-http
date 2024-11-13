@@ -255,10 +255,21 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 
 	var Audit *audit.Audit
 	if hasAudit {
+		metas := auditRule.GetMetas()
+		newMetas := make([]audit.Meta, 0, len(metas))
+		for _, meta := range metas {
+			newMetas = append(newMetas, audit.Meta{
+				Key: meta.GetKey(),
+				Value: audit.MetaValue{
+					Const:   meta.GetConst(),
+					Extract: meta.GetExtract(),
+				},
+			})
+		}
 		Audit = &audit.Audit{
-			Module:  auditRule.GetModule(),
-			Action:  auditRule.GetAction(),
-			Extract: auditRule.GetExtract(),
+			Module: auditRule.GetModule(),
+			Action: auditRule.GetAction(),
+			Metas:  newMetas,
 		}
 	}
 
