@@ -6,10 +6,18 @@ import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/Ccheers/protoc-gen-go-kratos-http/khttp;khttp";
 
+message AuditMeta {
+  string key = 1;
+  oneof value {
+    string extract = 2;
+    string const = 3;
+  }
+}
+
 message AuditRule {
   string module = 1;
   string action = 2;
-  map<string, string> extract = 3;
+  repeated AuditMeta metas = 3;
 }
 
 extend google.protobuf.MethodOptions {

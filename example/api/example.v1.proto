@@ -21,14 +21,20 @@ service Example {
     option (khttp.audit) = {
       module: "example"
       action: "hello"
-      extract: {
-        key: "name"
-        value: "name",
-      },
-      extract: {
-        key: "name2"
-        value: "name2"
-      }
+      metas: [
+        {
+          key: "cluster"
+          extract: "cluster_name"  // 从请求字段提取
+        },
+        {
+          key: "namespace"
+          const: "default"  // 使用常量值
+        },
+        {
+          key: "resource_type"
+          const: "example"
+        }
+      ]
     };
   };
 }

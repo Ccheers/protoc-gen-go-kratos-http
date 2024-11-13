@@ -78,12 +78,29 @@ func _{{$svrType}}_{{.Name}}{{.Num}}_HTTP_Handler(srv {{$svrType}}HTTPServer) fu
 		http.SetOperation(ctx,Operation{{$svrType}}{{.OriginalName}})
 
 		{{- if .HasAudit}}
-        extract := audit.ExtractFromRequest(ctx.Request(), map[string]string{
-            {{- range $key, $value := .Audit.Extract}}
-            "{{$key}}": "{{$value}}",
-            {{- end}}
-        })
-        auditInfo := audit.NewAudit("{{.Audit.Module}}", "{{.Audit.Action}}", extract)
+        auditRule := audit.NewAudit(
+            "{{.Audit.Module}}",
+            "{{.Audit.Action}}",
+            []audit.Meta{
+                {{- range .Audit.Metas}}
+                {
+                    Key: "{{.Key}}",
+                    Value: audit.MetaValue{
+                        {{- if .Value.Extract}}
+                        Extract: "{{.Value.Extract}}",
+                        {{- end}}
+                        {{- if .Value.Const}}
+                        Const: "{{.Value.Const}}",
+                        {{- end}}
+                    },
+                },
+                {{- end}}
+            },
+        )
+        auditInfo, err := audit.ExtractFromRequest(ctx.Request(), auditRule)
+        if err != nil {
+            return err
+        }
 		stdCtx = kcontext.SetKHTTPAuditContextWithContext(stdCtx, auditInfo)
 
         {{- end}}

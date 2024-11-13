@@ -80,11 +80,34 @@ func _Example_HelloWorld0_HTTP_Handler(srv ExampleHTTPServer) func(ctx http.Cont
 			return err
 		}
 		http.SetOperation(ctx, OperationExampleHelloWorld)
-		extract := audit.ExtractFromRequest(ctx.Request(), map[string]string{
-			"name":  "name",
-			"name2": "name2",
-		})
-		auditInfo := audit.NewAudit("example", "hello", extract)
+		auditRule := audit.NewAudit(
+			"example",
+			"hello",
+			[]audit.Meta{
+				{
+					Key: "cluster",
+					Value: audit.MetaValue{
+						Extract: "cluster_name",
+					},
+				},
+				{
+					Key: "namespace",
+					Value: audit.MetaValue{
+						Const: "default",
+					},
+				},
+				{
+					Key: "resource_type",
+					Value: audit.MetaValue{
+						Const: "example",
+					},
+				},
+			},
+		)
+		auditInfo, err := audit.ExtractFromRequest(ctx.Request(), auditRule)
+		if err != nil {
+			return err
+		}
 		stdCtx = kcontext.SetKHTTPAuditContextWithContext(stdCtx, auditInfo)
 
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
