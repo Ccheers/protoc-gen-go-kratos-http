@@ -5,6 +5,7 @@ package github.ccheers.pggh.example;
 import "google/api/annotations.proto";
 import "khttp/middleware.proto";
 import "khttp/audit.proto";
+import "khttp/rawjson.proto";
 
 option go_package = "github.com/Ccheers/protoc-gen-go-kratos-http/example/api;exampleapi";
 
@@ -42,5 +43,6 @@ service Example {
 
 message HelloWorldRequest {
   string name = 1;
+  khttp.RawJson raw = 2;
 }
 message HelloWorldReply {}
