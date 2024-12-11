@@ -31,3 +31,14 @@ func TestMarshal(t *testing.T) {
 	t.Log(string(got))
 
 }
+
+func TestUnMarshal(t *testing.T) {
+	data := `{"name":"test","raw":{"key":"value"}}`
+	var req HelloWorldRequest
+	err := json.Unmarshal([]byte(data), &req)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(&req)
+}
