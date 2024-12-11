@@ -246,7 +246,7 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 	// 有定义优先取定义
 	middlewareNames := parseMiddleware(m.Comments.Leading.String())
 	rule, ok := proto.GetExtension(m.Desc.Options(), khttp.E_Middleware).(*khttp.Middleware)
-	if ok {
+	if ok && rule != nil {
 		middlewareNames = rule.Names
 	}
 
